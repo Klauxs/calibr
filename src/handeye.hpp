@@ -102,6 +102,7 @@ void getAB ( vector<pair<Pose, Pose>>& AB, vector<Pose>& posev, vector<Pose>& po
         if ( b1.time == -1 )
         {
             iter += sect;
+            i++;
             continue;
         }
         b2 = find_pose( posev, (iter + i*sect)->time );
