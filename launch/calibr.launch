@@ -1,0 +1,7 @@
+<launch>
+    
+    <node name="calibr" pkg="calibr" type="calibr" output="screen">
+    <param name="config_file" type="string" value="adcd" />
+    </node>
+
+</launch>
