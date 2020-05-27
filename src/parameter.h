@@ -2,21 +2,12 @@
 #define PARAMETER_H
 
 #include <ros/ros.h>
+#include "camodocal/camera_models/CameraFactory.h"
 
-template <typename T>
-T readParam(ros::NodeHandle &n, std::string name)
-{
-    T ans;
-    if (n.getParam(name, ans))
-    {
-        ROS_INFO_STREAM("Loaded " << name << ": " << ans);
-    }
-    else
-    {
-        ROS_ERROR_STREAM("Failed to load " << name);
-        n.shutdown();
-    }
-    return ans;
-}
+extern int MAX_AB;
+extern std::vector<std::string> CAM_NAMES;
+
+void readParameters(ros::NodeHandle &n);
+void readIntrinsicParameter(const std::vector<std::string> &calib_file, std::vector<camodocal::CameraPtr> m_camera);
 
 #endif

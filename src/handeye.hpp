@@ -2,9 +2,10 @@
 #define HANDEYE_HPP
 
 #include<iomanip>
-#include "data_class.h"
+#include "parameter.h"
+#include "data_class.hpp"
 
-#define MAX_AB 100
+// #define MAX_AB 100
 
 void HandEye( Pose& res, vector<pair<Pose, Pose>> AB )
 {

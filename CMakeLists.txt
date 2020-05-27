@@ -9,6 +9,7 @@ find_package( catkin REQUIRED COMPONENTS
     std_msgs
     geometry_msgs
     nav_msgs
+    camera_models
     )
 
 find_package( Sophus REQUIRED )
@@ -22,6 +23,7 @@ catkin_package()
 
 add_executable( calibr 
     src/calibr_node.cpp    
+    src/parameter.cpp
     )
 
 target_link_libraries( calibr 

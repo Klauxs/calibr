@@ -5,10 +5,10 @@
 #include <sensor_msgs/PointCloud.h>
 #include <Eigen/Eigenvalues>
 #include <map>
-#include "data_class.h"
 #include "parameter.h"
+#include "data_class.hpp"
 #include "handeye.hpp"
-
+#include "camodocal/camera_models/Camera.h"
 
 vector<FeaturePerId> feature;
 vector<Pose> vpose;
@@ -139,9 +139,10 @@ int main ( int argc, char **argv )
     ros::NodeHandle n( "~" );
     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
 
-    std::string config_file;
-    config_file = readParam<std::string>(n, "config_file");
-    cout << config_file << endl;
+    readParameters(n);
+
+    vector<camodocal::CameraPtr> m_camera;
+    readIntrinsicParameter(CAM_NAMES, m_camera);
 
     ros::Subscriber sub_vodom = n.subscribe("/vins_estimator/odometry", 2000, vodom_callback);
     ros::Subscriber sub_image = n.subscribe("/vins_estimator/feature", 2000, feature_callback);

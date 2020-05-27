@@ -1,7 +1,9 @@
 <launch>
     
     <node name="calibr" pkg="calibr" type="calibr" output="screen">
-    <param name="config_file" type="string" value="adcd" />
+    <param name="cam0_calib" type="string" value="$(find calibr)/cam0_mei.yaml" />
+    <param name="cam1_calib" type="string" value="$(find calibr)/cam1_mei.yaml" />
+    <param name="MAX_AB" type="int" value="100" />
     </node>
 
 </launch>
