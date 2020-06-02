@@ -1,6 +1,7 @@
 #include "parameter.h"
 
 int MAX_AB;
+int MAX_POINT;
 std::vector<std::string> CAM_NAMES;
 
 template <typename T>
@@ -19,15 +20,6 @@ T readParam(ros::NodeHandle &n, std::string name)
     return ans;
 }
 
-void readIntrinsicParameter(const std::vector<std::string> &calib_file, std::vector<camodocal::CameraPtr> m_camera)
-{
-    for (size_t i = 0; i < calib_file.size(); i++)
-    {
-        ROS_INFO("reading paramerter of camera %s", calib_file[i].c_str());
-        camodocal::CameraPtr camera = camodocal::CameraFactory::instance()->generateCameraFromYamlFile(calib_file[i]);
-        m_camera.push_back(camera);
-    }
-}
 
 void readParameters(ros::NodeHandle &n)
 {
@@ -38,4 +30,5 @@ void readParameters(ros::NodeHandle &n)
     CAM_NAMES.push_back(cam_path);
 
     MAX_AB = readParam<int>(n, "MAX_AB");
+    MAX_POINT = readParam<int>(n, "MAX_POINT");
 }

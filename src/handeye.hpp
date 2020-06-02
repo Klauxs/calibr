@@ -3,7 +3,7 @@
 
 #include<iomanip>
 #include "parameter.h"
-#include "data_class.hpp"
+#include "data_class.h"
 
 // #define MAX_AB 100
 
@@ -99,14 +99,14 @@ void getAB ( vector<pair<Pose, Pose>>& AB, vector<Pose>& posev, vector<Pose>& po
         //     j = 1;
 
         tmp_A = betw_pose( *iter, *(iter + i * sect) );
-        b1 = find_pose( posev, iter->time );
+        b1 = find_pose( posev, iter->time )[0];
         if ( b1.time == -1 )
         {
             iter += sect;
             i++;
             continue;
         }
-        b2 = find_pose( posev, (iter + i*sect)->time );
+        b2 = find_pose( posev, (iter + i*sect)->time )[0];
         if ( b2.time != -1 )
         {
             tmp_B = betw_pose( b1, b2 );

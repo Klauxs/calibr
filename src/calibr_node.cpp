@@ -6,14 +6,15 @@
 #include <Eigen/Eigenvalues>
 #include <map>
 #include "parameter.h"
-#include "data_class.hpp"
+#include "data_class.h"
 #include "handeye.hpp"
-#include "camodocal/camera_models/Camera.h"
+#include "project_factor.h"
+#include "pose_parameterization.h"
 
 vector<FeaturePerId> feature;
-vector<Pose> vpose;
-vector<Pose> lpose;
+
 int rec_count, bflag = 0;
+using namespace ceres;
 
 void vodom_callback(const nav_msgs::OdometryPtr &vodom_msg)
 {
@@ -141,9 +142,6 @@ int main ( int argc, char **argv )
 
     readParameters(n);
 
-    vector<camodocal::CameraPtr> m_camera;
-    readIntrinsicParameter(CAM_NAMES, m_camera);
-
     ros::Subscriber sub_vodom = n.subscribe("/vins_estimator/odometry", 2000, vodom_callback);
     ros::Subscriber sub_image = n.subscribe("/vins_estimator/feature", 2000, feature_callback);
     ros::Subscriber sub_cloud = n.subscribe("/vins_estimator/margin_cloud", 2000, cloud_callback);
@@ -166,10 +164,46 @@ int main ( int argc, char **argv )
     Pose res;
 
     getAB( AB, vpose, lpose );
+    cout << "here" << endl;
     HandEye( res, AB );
-
     cout << res.getSE3().matrix() << endl;
     cout << AB.size() << endl;
+
+    double para[6], position[MAX_POINT][3], time = 0;
+    Eigen::Matrix<double, 6, 1> se3 = res.getSE3().log();
+    for(int i = 0; i < 6; ++i) para[i] = se3(i, 0);
+
+    ceres::Problem problem;
+    ceres::LossFunction *loss_function;
+    // loss_function = new ceres::HuberLoss(1.0);
+    loss_function = new ceres::CauchyLoss(1.0);
+    ceres::LocalParameterization *local_parameterization = new PoseParameterization();
+    problem.AddParameterBlock(para, 6, local_parameterization);
+    problem.AddParameterBlock(&time, 1);
+
+    int index, sect = feature.size() / MAX_POINT;
+    auto iter = feature.begin();
+    for ( int i = 0; i < MAX_POINT; i++ )
+    {
+        for(int j = 0; j < 3; j++) position[i][j] = iter->gt_p(j);
+        problem.AddParameterBlock(position[i], 3);
+        index = iter->feature_per_frame.size() / 3;
+        ProjectionFactor *f = new ProjectionFactor(iter->feature_per_frame[index], iter->gt_p);
+        problem.AddResidualBlock(f, loss_function, para, position[i], &time);
+        iter += sect;
+    }
+
+    ceres::Solver::Options options;
+
+    options.linear_solver_type = ceres::DENSE_SCHUR;
+    options.trust_region_strategy_type = ceres::DOGLEG;
+
+    ceres::Solver::Summary summary;
+    ceres::Solve(options, &problem, &summary);
+    cout << summary.BriefReport() << endl;
+    Eigen::Map<const Eigen::Matrix<double, 6, 1>> tcl(para);
+    cout << Sophus::SE3::exp(tcl).matrix() << endl;
+    cout << time << endl;
 
     return 0;
 }

@@ -4,6 +4,7 @@
     <param name="cam0_calib" type="string" value="$(find calibr)/cam0_mei.yaml" />
     <param name="cam1_calib" type="string" value="$(find calibr)/cam1_mei.yaml" />
     <param name="MAX_AB" type="int" value="100" />
+    <param name="MAX_POINT" type="int" value="1000" />
     </node>
 
 </launch>
